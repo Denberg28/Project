@@ -19,7 +19,7 @@ syllabus_input = st.text_area(
     height=200, 
     placeholder="e.g., Week 1: Introduction to Python\nWeek 2: Data Structures..."
 )
-
+#change test
 # --- Generation Trigger ---
 if st.button("Generate Course Material"):
     if not syllabus_input.strip():
