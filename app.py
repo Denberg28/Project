@@ -44,7 +44,7 @@ if st.button("Generate Course Material"):
                 
                 # Call the model (gemini-3.5-flash is best for speed and structured outputs)
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-3.1-flash-lite",
                     contents=prompt
                 )
                 
