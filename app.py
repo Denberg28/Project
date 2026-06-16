@@ -10,8 +10,8 @@ api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 # --- App UI Setup ---
-st.set_page_config(page_title="Course Maker", page_icon="📚", layout="centered")
-st.title("📚 Minimalist Course Maker")
+st.set_page_config(page_title="Course Framework", page_icon="📚", layout="centered")
+st.title("📚 Course Framework")
 st.write("Convert a simple syllabus into structured Markdown course material instantly, or view existing materials.")
 
 # --- Layout: Tabs ---
