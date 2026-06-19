@@ -1,0 +1,171 @@
+import streamlit as st
+from google import genai
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+api_key = os.getenv("GEMINI_API_KEY")
+
+st.set_page_config(page_title="Course Framework", page_icon="🛩️", layout="wide")
+st.title("🛩️ Course Framework")
+st.write("Generate course materials or a complete syllabus format.")
+
+if not api_key:
+    st.error("🔑 API Key Missing! Please configure GEMINI_API_KEY in your .env file.")
+    st.stop()
+
+client = genai.Client(api_key=api_key)
+
+tab1, tab2 = st.tabs(["✨ Generate Course", "📄 View .md File"])
+
+with tab1:
+    syllabus_input = st.text_area(
+        "Type / Paste your Syllabus or Course Details here:",
+        height=250,
+        placeholder="Course Code:\nCourse Name:\nDescription:\nObjectives:\nTopics:\nHours:"
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        generate_course = st.button("Generate Course Material", use_container_width=True)
+
+    with col2:
+        generate_syllabus = st.button("Generate Syllabus", use_container_width=True)
+
+    if generate_course:
+        if not syllabus_input.strip():
+            st.warning("Please enter a syllabus first.")
+        else:
+            with st.spinner("Generating structured course material..."):
+                try:
+                    prompt = f"""
+You are an expert curriculum developer and instructional designer.
+
+Convert the following syllabus into comprehensive structured course material.
+
+Rules:
+1. Output strictly in Markdown.
+2. Include module/week headers.
+3. Include introduction, lesson points, examples, activities, and summary.
+4. Do not include conversational filler.
+
+Input:
+{syllabus_input}
+"""
+
+                    response = client.models.generate_content(
+                        model="gemini-3.1-flash-lite",
+                        contents=prompt
+                    )
+
+                    st.success("Course material generated successfully!")
+
+                    st.download_button(
+                        label="⬇️ Download Course Material",
+                        data=response.text,
+                        file_name="course_material.md",
+                        mime="text/markdown"
+                    )
+
+                    st.markdown("---")
+                    st.markdown("### Preview")
+                    st.markdown(response.text)
+
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+    if generate_syllabus:
+        if not syllabus_input.strip():
+            st.warning("Please enter course details first.")
+        else:
+            with st.spinner("Generating syllabus..."):
+                try:
+                    prompt = f"""
+You are an expert curriculum developer.
+
+Create a formal course syllabus following this exact layout:
+
+# Course Syllabus
+
+| Field | Details |
+|---|---|
+| Course Code |  |
+| Course Name |  |
+| Course Description |  |
+| Number of Units for Lecture & Laboratory |  |
+| Numbers of Contact Hours per Week |  |
+| Pre-requisite |  |
+
+## Course Objectives
+
+1. 
+2. 
+3. 
+4. 
+5. 
+
+## Course Outline: Lecture
+
+| Topics | LEC HRS | LAB HRS |
+|---|---:|---:|
+| 1. Introduction |  |  |
+| 1.1 Subtopic |  |  |
+| 1.2 Subtopic |  |  |
+| 2. Main Topic |  |  |
+| 2.1 Subtopic |  |  |
+| 3. Main Topic |  |  |
+| Total |  |  |
+
+## Suggested Textbooks and References
+
+1. 
+2. 
+3. 
+
+Rules:
+1. Follow the table-based layout shown above.
+2. Fill in missing details logically based on the provided input.
+3. Use formal academic language.
+4. Output only Markdown.
+5. Do not include explanations outside the syllabus.
+
+Input:
+{syllabus_input}
+"""
+
+                    response = client.models.generate_content(
+                        model="gemini-3.1-flash-lite",
+                        contents=prompt
+                    )
+
+                    st.success("Syllabus generated successfully!")
+
+                    st.download_button(
+                        label="⬇️ Download Syllabus",
+                        data=response.text,
+                        file_name="generated_syllabus.md",
+                        mime="text/markdown"
+                    )
+
+                    st.markdown("---")
+                    st.markdown("### Syllabus Preview")
+                    st.markdown(response.text)
+
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+with tab2:
+    st.subheader("Upload Existing Course Material")
+    uploaded_file = st.file_uploader(
+        "Upload a Markdown (.md) file to preview it",
+        type=["md"]
+    )
+
+    if uploaded_file is not None:
+        markdown_content = uploaded_file.getvalue().decode("utf-8")
+
+        st.markdown("---")
+        st.markdown("### Document Preview")
+        st.markdown(markdown_content)
