@@ -20,7 +20,7 @@ tab1, tab2 = st.tabs(["✨ Generate Course", "📄 View .md File"])
 with tab1:
     # --- User Input ---
     syllabus_input = st.text_area(
-        "Paste your Syllabus here:", 
+        "Type/ Paste your Syllabus here:", 
         height=200, 
         placeholder="e.g., Week 1: Introduction to Python\nWeek 2: Data Structures..."
     )
